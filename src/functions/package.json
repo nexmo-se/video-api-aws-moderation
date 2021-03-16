@@ -1,0 +1,19 @@
+{
+  "name": "functions",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "sls deploy --aws-profile enrico.portolan-nexmo",
+    "test-create-room": "SLS_DEBUG=* serverless invoke local --function createRoom --path mock/createRoom.json"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "opentok": "^2.11.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.22.0",
+    "serverless": "^2.30.1"
+  }
+}

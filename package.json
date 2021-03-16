@@ -1,0 +1,22 @@
+{
+  "name": "video-api-aws-moderation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nexmo-se/video-api-aws-moderation.git"
+  },
+  "author": "Enrico Portolan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nexmo-se/video-api-aws-moderation/issues"
+  },
+  "homepage": "https://github.com/nexmo-se/video-api-aws-moderation#readme",
+  "dependencies": {
+    "dynamodb-toolbox": "^0.3.3"
+  }
+}

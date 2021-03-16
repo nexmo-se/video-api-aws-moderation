@@ -1,0 +1,6 @@
+{
+  "REGION": "eu-west-2",
+  "STAGE": "dev",
+  "OPENTOK_API_KEY": "YOUR_NEXMO_API_KEY",
+  "OPENTOK_API_SECRET": "YOUR_NEXMO_API_SECRET"
+}
