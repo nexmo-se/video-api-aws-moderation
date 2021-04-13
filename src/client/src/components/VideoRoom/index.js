@@ -10,6 +10,7 @@ import { usePublisher } from "../../hooks/usePublisher";
 import { useSession } from "../../hooks/useSession";
 import { ControlToolBar } from "../ControlToolBar";
 import { MeetingName } from "../MeetingName";
+import { Moderation } from "../Moderation";
 import useStyles from "./styles";
 import { UserContext } from "../../context/UserContext";
 import { useParams } from "react-router";
@@ -61,6 +62,8 @@ export function VideoRoom() {
         session: session.current,
         containerId: videoContainer.current.id,
         publisherOptions: { ...user.defaultSettings, name: user.userName },
+      }).then(()=>{
+
       });
     }
   }, [publish, session, connected, pubInitialised, user]);
@@ -94,6 +97,7 @@ export function VideoRoom() {
         currentPublisher={publisher}
         videoContainer={videoContainer.current}
       ></ControlToolBar>
+      <Moderation currentPublisher={publisher}/>
     </div>
   );
 }
