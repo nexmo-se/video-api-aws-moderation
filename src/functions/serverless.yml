@@ -15,6 +15,24 @@ provider:
 # you can overwrite defaults here
   stage: ${file(config.json):STAGE}
   region: ${file(config.json):REGION}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:PutItem"
+        - "dynamodb:GetItem"
+        - "dynamodb:Query"
+      Resource:
+        - "Fn::Join":
+            [
+              "",
+              [
+                "arn:aws:dynamodb:",
+                { "Ref": "AWS::Region" },
+                ":",
+                { "Ref": "AWS::AccountId" },
+                ":table/${file(config.json):DYNAMODB_TABLE}",
+              ],
+            ]
 
 functions:
   createRoom:
@@ -47,4 +65,4 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 2
           WriteCapacityUnits: 2
-        TableName: VideoModerationTable
+        TableName: ${file(config.json):DYNAMODB_TABLE}

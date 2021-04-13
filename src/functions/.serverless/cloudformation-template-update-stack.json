@@ -133,6 +133,32 @@
                       "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/video-moderation-service-dev*:*:*"
                     }
                   ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:PutItem",
+                    "dynamodb:GetItem",
+                    "dynamodb:Query"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:dynamodb:",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":table/VideoModerationTable"
+                        ]
+                      ]
+                    }
+                  ]
                 }
               ]
             }
@@ -161,7 +187,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/video-moderation-service/dev/1615911627369-2021-03-16T16:20:27.369Z/video-moderation-service.zip"
+          "S3Key": "serverless/video-moderation-service/dev/1615978234060-2021-03-17T10:50:34.060Z/video-moderation-service.zip"
         },
         "Handler": "api/room.handler",
         "Runtime": "nodejs12.x",
@@ -185,14 +211,14 @@
         "CreateRoomLogGroup"
       ]
     },
-    "CreateRoomLambdaVersion6OwtoCKjBREidQotgTOcGSeyPrrsPU3ghv4t4OIJ8G0": {
+    "CreateRoomLambdaVersioniUWura91MCEtr8mUbRBInjqc4WpnJYvsTTPKv4gNQU": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "CreateRoomLambdaFunction"
         },
-        "CodeSha256": "Y55B4T/5rk9vy9uwRkWP1YUctLR0SKkTKEuKe4ykDrU="
+        "CodeSha256": "tAeWY6j4IKGRARj1pqHzkqOtYiFMEY32xhn2gTKqECg="
       }
     },
     "ApiGatewayRestApi": {
@@ -310,7 +336,7 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1615911609084": {
+    "ApiGatewayDeployment1615978220482": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -400,7 +426,7 @@
     "CreateRoomLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "CreateRoomLambdaVersion6OwtoCKjBREidQotgTOcGSeyPrrsPU3ghv4t4OIJ8G0"
+        "Ref": "CreateRoomLambdaVersioniUWura91MCEtr8mUbRBInjqc4WpnJYvsTTPKv4gNQU"
       }
     },
     "ServiceEndpoint": {

@@ -1,15 +1,10 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useQuery } from "./../../hooks/useQuery";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import CheckBox from "@material-ui/icons/CheckBox";
-import Error from "@material-ui/icons/Error";
-import QualityTestDialog from "../QualityTestDialog";
-import { Button, Grid, Typography } from "@material-ui/core";
+import { Button, Grid, TextField } from "@material-ui/core";
 import { usePublisher } from "../../hooks/usePublisher";
 import { AudioSettings } from "../AudioSetting";
 import { VideoSettings } from "../VideoSetting";
-import { useNetworkTest } from "../../hooks/useNetworkTest";
 import { UserContext } from "../../context/UserContext";
 import useStyles from "./styles";
 
@@ -20,26 +15,13 @@ export function WaitingRoom() {
   const { push } = useHistory();
   const defaultLocalAudio = true;
   const defaultLocalVideo = true;
-  const userName = query.get("user-name")
-    ? query.get("user-name")
-    : user.userName;
+  const [userName, setUserName] = useState("");
+  const [roomName, setRoomName] = useState("");
   const [localAudio, setLocalAudio] = useState(defaultLocalAudio);
   const [localVideo, setLocalVideo] = useState(defaultLocalVideo);
-  const [showQualityDialog, setShowQualityDialog] = useState(false);
   const waitingRoomVideoContainer = useRef();
 
   const { publisher, initPublisher, destroyPublisher } = usePublisher();
-
-  const {
-    connectivityTest,
-    qualityTest,
-    runNetworkTest,
-    stopNetworkTest,
-  } = useNetworkTest({
-    apikey: process.env.REACT_APP_VIDEO_NETWORKTEST_API_KEY,
-    sessionId: process.env.REACT_APP_VIDEO_NETWORKTEST_SESSION,
-    token: process.env.REACT_APP_VIDEO_NETWORKTEST_TOKEN,
-  });
 
   const handleAudioChange = React.useCallback((e) => {
     setLocalAudio(e.target.checked);
@@ -49,13 +31,11 @@ export function WaitingRoom() {
     setLocalVideo(e.target.checked);
   }, []);
 
-  const handleQualityTestDialogClose = () => {
-    setShowQualityDialog(false);
-  };
-
   const handleJoinClick = () => {
-    stopNetworkTest(); // Stop network test
-    push("/video-room");
+    if (!userName || !roomName) {
+      return;
+    }
+    push(`/video-room/${roomName}`);
   };
 
   useEffect(() => {
@@ -84,17 +64,6 @@ export function WaitingRoom() {
   }, [localVideo, publisher]);
 
   useEffect(() => {
-    console.log("Effect Quality Test", qualityTest);
-    if (!qualityTest.loading) {
-      setShowQualityDialog(true);
-    }
-  }, [qualityTest]);
-
-  useEffect(() => {
-    runNetworkTest();
-  }, [runNetworkTest]);
-
-  useEffect(() => {
     return () => {
       console.log("useEffect destroyPublisher Unmount");
       destroyPublisher();
@@ -114,9 +83,26 @@ export function WaitingRoom() {
   return (
     <div className={classes.waitingRoomContainer}>
       <Grid container direction="column" justify="center" alignItems="center">
-        <Typography variant="h4" component="h2">
-          {userName}
-        </Typography>
+        <form className={classes.root} noValidate autoComplete="off">
+          <TextField
+            id="standard-basic"
+            label="Room Name"
+            variant="outlined"
+            value={roomName}
+            onChange={(event) => setRoomName(event.target.value)}
+            error={roomName === ""}
+            helperText={roomName === "" ? "Type a room name" : " "}
+          />
+          <TextField
+            id="standard-basic"
+            label="Username"
+            variant="outlined"
+            value={userName}
+            onChange={(event) => setUserName(event.target.value)}
+            error={userName === ""}
+            helperText={userName === "" ? "Type a user name" : " "}
+          />
+        </form>
         <div
           id="waiting-room-video-container"
           className={classes.waitingRoomVideoPreview}
@@ -133,39 +119,6 @@ export function WaitingRoom() {
             hasVideo={localVideo}
             onVideoChange={handleVideoChange}
           />
-        </div>
-      </Grid>
-      <Grid container direction="column" justify="center" alignItems="center">
-        <div className={classes.networkTestContainer}>
-          <div className={classes.flex}>
-            <div>Connectivity Test:</div>
-            <div>
-              {connectivityTest.loading ? (
-                <CircularProgress size={20} />
-              ) : connectivityTest.data && connectivityTest.data.success ? (
-                <CheckBox className={classes.green}></CheckBox>
-              ) : (
-                <Error className={classes.red} />
-              )}
-            </div>
-          </div>
-          <div className={classes.flex}>
-            <div>Quality Test:</div>
-            <div>
-              {qualityTest.loading ? (
-                <CircularProgress size={20} />
-              ) : qualityTest.data ? (
-                <CheckBox className={classes.green}></CheckBox>
-              ) : (
-                <Error className={classes.red} />
-              )}
-            </div>
-          </div>
-          <QualityTestDialog
-            selectedValue={qualityTest}
-            open={showQualityDialog}
-            onClose={handleQualityTestDialogClose}
-          ></QualityTestDialog>
         </div>
       </Grid>
       <Grid container direction="column" justify="center" alignItems="center">

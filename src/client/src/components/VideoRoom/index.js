@@ -8,23 +8,21 @@ import React, {
 import { getCredentials } from "../../api/credentials";
 import { usePublisher } from "../../hooks/usePublisher";
 import { useSession } from "../../hooks/useSession";
-import { useChat } from "../../hooks/useChat";
 import { ControlToolBar } from "../ControlToolBar";
-import { Chat } from "../Chat";
 import { MeetingName } from "../MeetingName";
 import useStyles from "./styles";
 import { UserContext } from "../../context/UserContext";
+import { useParams } from "react-router";
 
 export function VideoRoom() {
+  let { roomName } = useParams();
   const { user } = useContext(UserContext);
   const videoContainer = useRef();
   const { publisher, publish, pubInitialised } = usePublisher();
   const { session, createSession, connected } = useSession({
     container: videoContainer,
   });
-  const { open, toggleChat, messages, sendMessage } = useChat({
-    session: session.current,
-  });
+
   const [credentials, setCredentials] = useState(null);
   const [hasAudio, setHasAudio] = useState(user.defaultSettings.publishAudio);
   const [hasVideo, setHasVideo] = useState(user.defaultSettings.publishVideo);
@@ -38,18 +36,15 @@ export function VideoRoom() {
     setHasVideo((prevVideo) => !prevVideo);
   }, []);
 
-  const sendChatMessage = (message) => {
-    sendMessage({ message });
-  };
-
   useEffect(() => {
-    getCredentials("").then(({ apikey, sessionId, token }) => {
+    getCredentials(roomName).then(({ apikey, sessionId, token }) => {
       setCredentials({ apikey, sessionId, token });
     });
-  }, []);
+  }, [roomName]);
 
   useEffect(() => {
     if (credentials) {
+      console.log("credentials", credentials);
       createSession(credentials);
     }
   }, [createSession, credentials]);
@@ -89,12 +84,6 @@ export function VideoRoom() {
       ref={videoContainer}
     >
       <MeetingName meetingName={"Meeting"} />
-      <Chat
-        messages={messages}
-        open={open}
-        handleToggleChat={toggleChat}
-        sendChatMessage={sendChatMessage}
-      ></Chat>
       <ControlToolBar
         className={classes.controlToolbar}
         hasAudio={hasAudio}
@@ -104,7 +93,6 @@ export function VideoRoom() {
         currentSession={session.current}
         currentPublisher={publisher}
         videoContainer={videoContainer.current}
-        handleToggleChat={toggleChat}
       ></ControlToolBar>
     </div>
   );
