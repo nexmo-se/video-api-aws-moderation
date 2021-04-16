@@ -2,7 +2,10 @@ import axios from "axios";
 import { base64ToBlob } from "../utils";
 
 export const sendImage = async (base64) => {
-  let URL = `${process.env.REACT_APP_BASE_URL_DEV}/detect`;
+  if (!base64) {
+    return;
+  }
+  let URL = `${process.env.REACT_APP_BASE_URL_DEV}/moderation`;
   const blob = base64ToBlob(base64, "image/png");
   let data = new FormData();
 
@@ -14,14 +17,15 @@ export const sendImage = async (base64) => {
       "Content-Type": "multipart/form-data",
     },
   };
-
   return axios
     .post(URL, data, config)
     .then((response) => {
-      console.log("response", response); // TODO parse response?
-      return response;
+      if (response && response.data) {
+        return response.data;
+      }
+      return null;
     })
     .catch((error) => {
-      console.log("error", error);
+      return { error: true };
     });
 };

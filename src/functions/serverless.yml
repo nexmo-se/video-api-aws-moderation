@@ -1,11 +1,14 @@
 service: video-moderation-service
-# app and org for use with dashboard.serverless.com
-#app: your-app-name
-#org: your-org-name
 
-# You can pin your service to only deploy with a specific Serverless version
-# Check out our docs for more details
 frameworkVersion: '2'
+
+plugins:
+ - serverless-apigw-binary
+
+custom:
+  apigwBinary:
+    types:           #list of mime-types
+      - 'multipart/form-data'
 
 provider:
   name: aws
@@ -33,6 +36,15 @@ provider:
                 ":table/${file(config.json):DYNAMODB_TABLE}",
               ],
             ]
+    - Effect: "Allow"
+      Action:
+        - "rekognition:DetectModerationLabels"
+      Resource:
+        - '*'     
+  # apiGateway:
+  #   binaryMediaTypes:
+  #     - 'image/png'
+  #     - ‘image/jpeg’
 
 functions:
   createRoom:
@@ -44,7 +56,14 @@ functions:
           cors: true
     environment:
       OPENTOK_API_KEY: ${file(config.json):OPENTOK_API_KEY}
-      OPENTOK_API_SECRET: ${file(config.json):OPENTOK_API_SECRET}      
+      OPENTOK_API_SECRET: ${file(config.json):OPENTOK_API_SECRET}
+  moderation:
+    handler: api/moderation.handler
+    events:
+      - http:
+          path: /moderation
+          method: post
+          cors: true    
 
 
 resources:

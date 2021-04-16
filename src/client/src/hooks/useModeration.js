@@ -1,22 +1,62 @@
-/* import { useEffect, useState } from "react";
-
-
-import sendImage from "./../api/sendImage";
+import { useState } from "react";
+import useInterval from "./useInterval";
+import useTimeout from "./useTimeout";
+import useSignal from "./useSignal";
+import { sendImage } from "./../api/sendImage";
 
 const screenshotTimeout = 1000;
+const disableTimeout = 10000;
 
-export default function useModeration() {
-  const [isActive, setIsActive] = useState(true);
+export default function useModeration({
+  currentPublisher,
+  currentSession,
+  setWarnOpenSnackbar,
+  setCameraIsInappropriate,
+  setInfoOpenSnackbar,
+}) {
+  const [isModerationActive, setIsActive] = useState(true);
+  const [intervalDelay, setIntervalDelay] = useState(screenshotTimeout);
+  const [timeoutDelay, setTimeoutDelay] = useState(disableTimeout);
+  const [isTimeoutRunning, setIsTimeoutRunning] = useState(false);
+  const [isIntervalRunning, setIsIntervalRunning] = useState(true);
+  useSignal(currentSession, { handleSetInfoOpenSnackbar: setInfoOpenSnackbar });
 
-  // todo transform this to a custom hook as I need to handl;e the timeout?
-  // TODO need to access the publisher or just pass the image?
+  useInterval(
+    () => {
+      if (
+        currentPublisher &&
+        !currentPublisher.isLoading() &&
+        isModerationActive
+      ) {
+        sendImage(currentPublisher.getImgData()).then((res) => {
+          console.log("[sendImage]", res);
+          if (res && res.error) {
+            return;
+          }
+          if (res.isInappropriate) {
+            setIsActive(false);
+            setWarnOpenSnackbar(true);
+            setIsIntervalRunning(false);
+            setIsTimeoutRunning(true);
+            setCameraIsInappropriate(true);
+          }
+        });
+      }
+    },
+    isIntervalRunning ? intervalDelay : null
+  );
 
-  const startModeration = (publisher) => {};
+  useTimeout(
+    () => {
+      setIsActive(true);
+      setIsTimeoutRunning(false);
+      setIsIntervalRunning(true);
+      setCameraIsInappropriate(false);
+    },
+    isTimeoutRunning ? timeoutDelay : null
+  );
 
-  useEffect(() => {
-    useInterval(() => {
-      sendScreenshot(base64Image).then((res) => {});
-    }, screenshotTimeout);
-  }, []);
+  return {
+    isModerationActive,
+  };
 }
- */

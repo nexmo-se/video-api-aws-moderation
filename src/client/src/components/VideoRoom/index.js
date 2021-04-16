@@ -27,6 +27,7 @@ export function VideoRoom() {
   const [credentials, setCredentials] = useState(null);
   const [hasAudio, setHasAudio] = useState(user.defaultSettings.publishAudio);
   const [hasVideo, setHasVideo] = useState(user.defaultSettings.publishVideo);
+  const [cameraIsInappropriate, setCameraIsInappropriate] = useState(false);
   const classes = useStyles();
 
   const toggleAudio = useCallback(() => {
@@ -37,6 +38,25 @@ export function VideoRoom() {
     setHasVideo((prevVideo) => !prevVideo);
   }, []);
 
+  /* const disableVideoForInappropriateContent =  () => {
+    // todo Send Signal
+    if (session && publisher) {
+      publisher.publishVideo(false);
+      setCameraIsInappropriate(true);
+      // todo add Timeout - need to enable after X seconds
+    }
+  } */
+
+  useEffect(() => {
+    if (cameraIsInappropriate && session && publisher) {
+      publisher.publishVideo(false);
+      session.current.signal({
+        data: JSON.stringify({ publisher: publisher.id }),
+        type: "inappropriate_content",
+      });
+    }
+  }, [cameraIsInappropriate, session, publisher]);
+
   useEffect(() => {
     getCredentials(roomName).then(({ apikey, sessionId, token }) => {
       setCredentials({ apikey, sessionId, token });
@@ -45,7 +65,6 @@ export function VideoRoom() {
 
   useEffect(() => {
     if (credentials) {
-      console.log("credentials", credentials);
       createSession(credentials);
     }
   }, [createSession, credentials]);
@@ -62,9 +81,7 @@ export function VideoRoom() {
         session: session.current,
         containerId: videoContainer.current.id,
         publisherOptions: { ...user.defaultSettings, name: user.userName },
-      }).then(()=>{
-
-      });
+      }).then(() => {});
     }
   }, [publish, session, connected, pubInitialised, user]);
 
@@ -75,10 +92,10 @@ export function VideoRoom() {
   }, [hasAudio, publisher]);
 
   useEffect(() => {
-    if (publisher) {
+    if (publisher && !cameraIsInappropriate) {
       publisher.publishVideo(hasVideo);
     }
-  }, [hasVideo, publisher]);
+  }, [hasVideo, publisher, cameraIsInappropriate]);
 
   return (
     <div
@@ -97,7 +114,11 @@ export function VideoRoom() {
         currentPublisher={publisher}
         videoContainer={videoContainer.current}
       ></ControlToolBar>
-      <Moderation currentPublisher={publisher}/>
+      <Moderation
+        currentPublisher={publisher}
+        currentSession={session.current}
+        setCameraIsInappropriate={setCameraIsInappropriate}
+      />
     </div>
   );
 }

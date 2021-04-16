@@ -39,7 +39,7 @@ module.exports.handler = async (event) => {
       throw new Error("MALFORMED_DATA_INPUT - ROOM NAME NOT VALID");
     }
     const { room, sessionId, token } = await handleRoomCreation(
-      body.roomName.trim()
+      body.roomName.trim().toLowerCase()
     );
     return {
       statusCode: 200,

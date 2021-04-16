@@ -1,43 +1,78 @@
 import React, { useEffect, useState } from "react";
-import {sendImage} from "./../../api/sendImage";
+import { sendImage } from "./../../api/sendImage";
 import useInterval from "./../../hooks/useInterval";
+import useModeration from "./../../hooks/useModeration";
 
-import { Button, Snackbar } from "@material-ui/core";
+import { Button, Chip, Snackbar } from "@material-ui/core";
 import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
+import FaceIcon from "@material-ui/icons/Face";
+
+import useStyles from "./styles";
 
 function Alert(props: AlertProps) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-export function Moderation({ currentPublisher }) {
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [isEnabled, setIsEnabled] = useState(true);
+export function Moderation({
+  currentPublisher,
+  currentSession,
+  setCameraIsInappropriate,
+}) {
+  const [openWarnSnackbar, setWarnOpenSnackbar] = useState(false);
+  const [openInfoSnackbar, setInfoOpenSnackbar] = useState(false);
+  const { isModerationActive } = useModeration({
+    currentPublisher,
+    currentSession,
+    setWarnOpenSnackbar,
+    setInfoOpenSnackbar,
+    setCameraIsInappropriate,
+  });
 
-  // TODO need to access the publisher or just pass the image?
+  const classes = useStyles();
 
-  useInterval(() => {
-    if (currentPublisher && isEnabled) {
-      sendImage(currentPublisher.getImgData()).then((res) => {
-        // Show a dialog?
-        // todo handle when to show a dialog + stop the Moderation as it's not needed
-        setIsEnabled(false);
-        setOpenSnackbar(true);
-      });
-    }
-  }, 1000);
-
-  const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
+  const handleWarnClose = (event?: React.SyntheticEvent, reason?: string) => {
     if (reason === "clickaway") {
       return;
     }
-    setOpenSnackbar(false);
+    setWarnOpenSnackbar(false);
+  };
+
+  const handleInfoClose = (event?: React.SyntheticEvent, reason?: string) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setInfoOpenSnackbar(false);
   };
 
   return (
-    <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleClose}>
-      <Alert onClose={handleClose} severity="warning">
-        We have disabled your webcam
-      </Alert>
-    </Snackbar>
+    <>
+      <Chip
+        className={classes.moderationChip}
+        icon={<FaceIcon />}
+        label={isModerationActive ? "Moderation Active" : "Moderation Disabled"}
+        variant="outlined"
+      />
+      <Snackbar
+        open={openWarnSnackbar}
+        autoHideDuration={10000}
+        onClose={handleWarnClose}
+      >
+        <Alert onClose={handleWarnClose} severity="warning">
+          We have disabled your webcam because we have detected Inappropriate
+          Content
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={openInfoSnackbar}
+        autoHideDuration={10000}
+        onClose={handleInfoClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={handleInfoClose} severity="info">
+          We have disabled the participant's video because we have detected
+          Inappropriate Content
+        </Alert>
+      </Snackbar>
+    </>
   );
 }

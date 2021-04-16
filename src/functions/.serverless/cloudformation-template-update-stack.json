@@ -77,6 +77,12 @@
         "LogGroupName": "/aws/lambda/video-moderation-service-dev-createRoom"
       }
     },
+    "ModerationLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/video-moderation-service-dev-moderation"
+      }
+    },
     "IamRoleLambdaExecution": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -159,6 +165,15 @@
                       ]
                     }
                   ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "rekognition:DetectModerationLabels"
+                  ],
+                  "Resource": [
+                    "*"
+                  ]
                 }
               ]
             }
@@ -187,7 +202,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/video-moderation-service/dev/1615978234060-2021-03-17T10:50:34.060Z/video-moderation-service.zip"
+          "S3Key": "serverless/video-moderation-service/dev/1618561727433-2021-04-16T08:28:47.433Z/video-moderation-service.zip"
         },
         "Handler": "api/room.handler",
         "Runtime": "nodejs12.x",
@@ -211,14 +226,49 @@
         "CreateRoomLogGroup"
       ]
     },
-    "CreateRoomLambdaVersioniUWura91MCEtr8mUbRBInjqc4WpnJYvsTTPKv4gNQU": {
+    "ModerationLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/video-moderation-service/dev/1618561727433-2021-04-16T08:28:47.433Z/video-moderation-service.zip"
+        },
+        "Handler": "api/moderation.handler",
+        "Runtime": "nodejs12.x",
+        "FunctionName": "video-moderation-service-dev-moderation",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "ModerationLogGroup"
+      ]
+    },
+    "CreateRoomLambdaVersionE0VFWCz5zpDTpG5xw8pc3OSXalJuVWtwh371SY0": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "CreateRoomLambdaFunction"
         },
-        "CodeSha256": "tAeWY6j4IKGRARj1pqHzkqOtYiFMEY32xhn2gTKqECg="
+        "CodeSha256": "QS+YAx9hoqUtfS1CpO2sjdd4KglQeN8qLmOcHo3Md14="
+      }
+    },
+    "ModerationLambdaVersionERmm5EkREr8jcYQUxVPsIaHPX9wUHeETPk1nJFu22TY": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "ModerationLambdaFunction"
+        },
+        "CodeSha256": "QS+YAx9hoqUtfS1CpO2sjdd4KglQeN8qLmOcHo3Md14="
       }
     },
     "ApiGatewayRestApi": {
@@ -243,6 +293,21 @@
           ]
         },
         "PathPart": "room",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceModeration": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "moderation",
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
         }
@@ -293,6 +358,51 @@
         }
       }
     },
+    "ApiGatewayMethodModerationOptions": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true,
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true
+            },
+            "ResponseModels": {}
+          }
+        ],
+        "RequestParameters": {},
+        "Integration": {
+          "Type": "MOCK",
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          },
+          "ContentHandling": "CONVERT_TO_TEXT",
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200",
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+              },
+              "ResponseTemplates": {
+                "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".+\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+              }
+            }
+          ]
+        },
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceModeration"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
     "ApiGatewayMethodRoomPost": {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
@@ -336,7 +446,50 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1615978220482": {
+    "ApiGatewayMethodModerationPost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "POST",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceModeration"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "ModerationLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      }
+    },
+    "ApiGatewayDeployment1618561711749": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -346,7 +499,9 @@
       },
       "DependsOn": [
         "ApiGatewayMethodRoomOptions",
-        "ApiGatewayMethodRoomPost"
+        "ApiGatewayMethodModerationOptions",
+        "ApiGatewayMethodRoomPost",
+        "ApiGatewayMethodModerationPost"
       ]
     },
     "CreateRoomLambdaPermissionApiGateway": {
@@ -355,6 +510,43 @@
         "FunctionName": {
           "Fn::GetAtt": [
             "CreateRoomLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "ModerationLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "ModerationLambdaFunction",
             "Arn"
           ]
         },
@@ -426,7 +618,13 @@
     "CreateRoomLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "CreateRoomLambdaVersioniUWura91MCEtr8mUbRBInjqc4WpnJYvsTTPKv4gNQU"
+        "Ref": "CreateRoomLambdaVersionE0VFWCz5zpDTpG5xw8pc3OSXalJuVWtwh371SY0"
+      }
+    },
+    "ModerationLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "ModerationLambdaVersionERmm5EkREr8jcYQUxVPsIaHPX9wUHeETPk1nJFu22TY"
       }
     },
     "ServiceEndpoint": {

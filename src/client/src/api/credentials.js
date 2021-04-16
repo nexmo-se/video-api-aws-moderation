@@ -16,6 +16,12 @@ export const getCredentials = async (roomName) => {
       })
       .catch((err) => {
         console.log("getCredentials - err", err);
+        return {
+          apikey: "",
+          sessionId: "",
+          token: "",
+          room: "",
+        };
       });
   } else {
     return fetch(`${process.env.REACT_APP_BASE_URL_PROD}dev`)
