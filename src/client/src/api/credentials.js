@@ -5,7 +5,6 @@ export const getCredentials = async (roomName) => {
     return axios
       .post(`${process.env.REACT_APP_BASE_URL_DEV}/room`, { roomName })
       .then((response) => {
-        console.log("getCredentials", response);
         const { apiKey, sessionId, room, token } = response.data;
         return {
           apikey: apiKey,
@@ -15,7 +14,6 @@ export const getCredentials = async (roomName) => {
         };
       })
       .catch((err) => {
-        console.log("getCredentials - err", err);
         return {
           apikey: "",
           sessionId: "",
@@ -24,13 +22,23 @@ export const getCredentials = async (roomName) => {
         };
       });
   } else {
-    return fetch(`${process.env.REACT_APP_BASE_URL_PROD}dev`)
-      .then((x) => x.json())
-      .then((y) => {
+    return axios
+      .post(`${process.env.REACT_APP_BASE_URL_PROD}/room`, { roomName })
+      .then((response) => {
+        const { apiKey, sessionId, room, token } = response.data;
         return {
-          apikey: y.apikey,
-          sessionId: y.sessionId,
-          token: y.token,
+          apikey: apiKey,
+          sessionId,
+          token,
+          room,
+        };
+      })
+      .catch((err) => {
+        return {
+          apikey: "",
+          sessionId: "",
+          token: "",
+          room: "",
         };
       });
   }

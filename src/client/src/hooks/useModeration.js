@@ -29,7 +29,6 @@ export default function useModeration({
         isModerationActive
       ) {
         sendImage(currentPublisher.getImgData()).then((res) => {
-          console.log("[sendImage]", res);
           if (res && res.error) {
             return;
           }

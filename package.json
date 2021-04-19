@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/nexmo-se/video-api-aws-moderation#readme",
   "dependencies": {
-    "dynamodb-toolbox": "^0.3.3"
+    "dynamodb-toolbox": "^0.3.3",
+    "serverless-s3-sync": "^1.17.0"
   }
 }
