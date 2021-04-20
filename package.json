@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "client-s3-deploy": "aws s3 sync src/client/build/ s3://video-api-aws-moderation --profile enrico.portolan-nexmo",
-    "cloudfront-invalidation": "aws cloudfront create-invalidation --distribution-id E3EX51NPNIF8V9 --paths '/*' --profile enrico.portolan-nexmo ",
-    "deploy": "cd src/client/ && npm run build && cd cd ../.. && npm run s3-deploy && npm run cloudfront-invalidation"
+    "client-cloudfront-invalidation": "aws cloudfront create-invalidation --distribution-id E3EX51NPNIF8V9 --paths '/*' --profile enrico.portolan-nexmo ",
+    "client-deploy": "cd src/client/ && npm run build && cd ../.. && npm run client-s3-deploy && npm run client-cloudfront-invalidation",
+    "server-deploy": "cd src/functions && npm run deploy && cd ../"
   },
   "repository": {
     "type": "git",
