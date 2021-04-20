@@ -1,8 +1,8 @@
-import { useState } from "react";
-import useInterval from "./useInterval";
-import useTimeout from "./useTimeout";
-import useSignal from "./useSignal";
-import { sendImage } from "./../api/sendImage";
+import { useState } from 'react';
+import useInterval from './useInterval';
+import useTimeout from './useTimeout';
+import useSignal from './useSignal';
+import { sendImage } from './../api/sendImage';
 
 const screenshotTimeout = 1000;
 const disableTimeout = 10000;
@@ -14,7 +14,7 @@ export default function useModeration({
   setCameraIsInappropriate,
   setInfoOpenSnackbar,
 }) {
-  const [isModerationActive, setIsActive] = useState(true);
+  const [isModerationActive, setIsModerationActive] = useState(true);
   const [intervalDelay, setIntervalDelay] = useState(screenshotTimeout);
   const [timeoutDelay, setTimeoutDelay] = useState(disableTimeout);
   const [isTimeoutRunning, setIsTimeoutRunning] = useState(false);
@@ -28,12 +28,12 @@ export default function useModeration({
         !currentPublisher.isLoading() &&
         isModerationActive
       ) {
-        sendImage(currentPublisher.getImgData()).then((res) => {
+        sendImage(currentPublisher.getImgData()).then(res => {
           if (res && res.error) {
             return;
           }
-          if (res.isInappropriate) {
-            setIsActive(false);
+          if (res && res.isInappropriate) {
+            // setIsModerationActive(false);
             setWarnOpenSnackbar(true);
             setIsIntervalRunning(false);
             setIsTimeoutRunning(true);
@@ -47,7 +47,7 @@ export default function useModeration({
 
   useTimeout(
     () => {
-      setIsActive(true);
+      // setIsModerationActive(true);
       setIsTimeoutRunning(false);
       setIsIntervalRunning(true);
       setCameraIsInappropriate(false);
@@ -57,5 +57,6 @@ export default function useModeration({
 
   return {
     isModerationActive,
+    setIsModerationActive
   };
 }

@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "client-s3-deploy": "aws s3 sync src/client/build/ s3://video-api-aws-moderation --profile enrico.portolan-nexmo",
+    "cloudfront-invalidation": "aws cloudfront create-invalidation --distribution-id E3EX51NPNIF8V9 --paths '/*' --profile enrico.portolan-nexmo ",
+    "deploy": "cd src/client/ && npm run build && cd cd ../.. && npm run s3-deploy && npm run cloudfront-invalidation"
   },
   "repository": {
     "type": "git",
@@ -15,9 +17,5 @@
   "bugs": {
     "url": "https://github.com/nexmo-se/video-api-aws-moderation/issues"
   },
-  "homepage": "https://github.com/nexmo-se/video-api-aws-moderation#readme",
-  "dependencies": {
-    "dynamodb-toolbox": "^0.3.3",
-    "serverless-s3-sync": "^1.17.0"
-  }
+  "homepage": "https://github.com/nexmo-se/video-api-aws-moderation#readme"
 }
