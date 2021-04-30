@@ -14,7 +14,7 @@ export default function useModeration({
   setCameraIsInappropriate,
   setInfoOpenSnackbar,
 }) {
-  const [isModerationActive, setIsModerationActive] = useState(true);
+  const [isModerationActive, setIsModerationActive] = useState(false);
   const [intervalDelay, setIntervalDelay] = useState(screenshotTimeout);
   const [timeoutDelay, setTimeoutDelay] = useState(disableTimeout);
   const [isTimeoutRunning, setIsTimeoutRunning] = useState(false);
@@ -57,6 +57,6 @@ export default function useModeration({
 
   return {
     isModerationActive,
-    setIsModerationActive
+    setIsModerationActive,
   };
 }
