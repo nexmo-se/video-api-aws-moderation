@@ -1,10 +1,10 @@
-import { MicButton } from "../MicButton";
-import { VideoButton } from "../VideoButton";
-import { ScreenShare } from "../ScreenShare";
-import { ChatButton } from "../ChatButton";
-import { SettingsButton } from "../SettingsButton";
-import { useCallback, useEffect, useRef, useState } from "react";
-import useStyles from "./styles";
+import { MicButton } from '../MicButton';
+import { VideoButton } from '../VideoButton';
+import { ScreenShare } from '../ScreenShare';
+import { ChatButton } from '../ChatButton';
+import { SettingsButton } from '../SettingsButton';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import useStyles from './styles';
 
 export const ControlToolBar = ({
   className,
@@ -14,6 +14,7 @@ export const ControlToolBar = ({
   handleVideoButtonClick,
   handleToggleScreenShare,
   handleToggleChat,
+  isModerationActive,
   currentSession,
   currentPublisher,
   videoContainer,
@@ -30,30 +31,13 @@ export const ControlToolBar = ({
     }, hiddenTimeoutTimer);
   }, []);
 
-  function handleMouseEnter() {
-    clearTimeout(hiddenTimeout.current);
-    setVisible(true);
-  }
-
-  function handleMouseLeave() {
-    setHiddenTimeout();
-  }
-
   useEffect(() => {
     setHiddenTimeout();
   }, [setHiddenTimeout]);
 
   return (
-    <div
-      className={className}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      <div
-        className={`${classes.toolbarBackground} ${
-          !visible ? classes.hidden : ""
-        }`}
-      >
+    <div className={className}>
+      <div className={classes.toolbarBackground}>
         <ChatButton onClick={handleToggleChat}></ChatButton>
         <MicButton
           hasAudio={hasAudio}
@@ -66,6 +50,7 @@ export const ControlToolBar = ({
         <ScreenShare
           currentSession={currentSession}
           videoContainer={videoContainer}
+          isModerationActive={isModerationActive}
         ></ScreenShare>
         <SettingsButton currentPublisher={currentPublisher} />
       </div>
