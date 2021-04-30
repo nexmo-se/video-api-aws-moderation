@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/nexmo-se/video-api-aws-moderation/issues"
   },
-  "homepage": "https://github.com/nexmo-se/video-api-aws-moderation#readme"
+  "homepage": "https://github.com/nexmo-se/video-api-aws-moderation#readme",
+  "dependencies": {
+    "@opentok/client": "^2.19.3"
+  }
 }
