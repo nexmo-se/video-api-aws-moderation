@@ -131,7 +131,7 @@ export function ScreenShare({
           )}
         </Alert>
       </Snackbar>
-      <Snackbar
+      {/*  <Snackbar
         open={openInfoSnackbar}
         autoHideDuration={10000}
         onClose={handleInfoClose}
@@ -143,7 +143,7 @@ export function ScreenShare({
             Inappropriate Content
           </h4>
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
     </>
   );
 }

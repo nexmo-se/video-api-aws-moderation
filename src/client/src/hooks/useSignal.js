@@ -1,24 +1,24 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect } from 'react';
 
 export default function useSignal(session, { handleSetInfoOpenSnackbar }) {
   const sendSignalToAll = useCallback((session, payload) => {
     session.signal(payload, function (error) {
       if (error) {
         console.log(
-          "[useSignal] - Error (" + error.name + "): " + error.message
+          '[useSignal] - Error (' + error.name + '): ' + error.message
         );
       } else {
-        console.log("[useSignal] - Signal Sent");
+        console.log('[useSignal] - Signal Sent');
       }
     });
   }, []);
 
   useEffect(() => {
     if (session) {
-      session.on("signal", (event) => {
-        console.log("Signal sent from connection " + event.type);
+      session.on('signal', (event) => {
+        console.log('Signal sent from connection ' + event.from.connection);
         switch (event.type) {
-          case "signal:inappropriate_content":
+          case 'signal:inappropriate_content':
             if (
               session.connection &&
               event.from.connectionId !== session.connection.id
@@ -33,7 +33,7 @@ export default function useSignal(session, { handleSetInfoOpenSnackbar }) {
 
     return () => {
       if (session) {
-        session.off("signal");
+        session.off('signal');
       }
     };
   }, [session, handleSetInfoOpenSnackbar]);
