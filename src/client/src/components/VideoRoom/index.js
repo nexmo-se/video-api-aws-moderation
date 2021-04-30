@@ -4,16 +4,16 @@ import React, {
   useEffect,
   useRef,
   useState,
-} from "react";
-import { getCredentials } from "../../api/credentials";
-import { usePublisher } from "../../hooks/usePublisher";
-import { useSession } from "../../hooks/useSession";
-import { ControlToolBar } from "../ControlToolBar";
-import { MeetingName } from "../MeetingName";
-import { Moderation } from "../Moderation";
-import useStyles from "./styles";
-import { UserContext } from "../../context/UserContext";
-import { useParams } from "react-router";
+} from 'react';
+import { getCredentials } from '../../api/credentials';
+import { usePublisher } from '../../hooks/usePublisher';
+import { useSession } from '../../hooks/useSession';
+import { ControlToolBar } from '../ControlToolBar';
+import { MeetingName } from '../MeetingName';
+import { Moderation } from '../Moderation';
+import useStyles from './styles';
+import { UserContext } from '../../context/UserContext';
+import { useParams } from 'react-router';
 
 export function VideoRoom() {
   let { roomName } = useParams();
@@ -27,6 +27,7 @@ export function VideoRoom() {
   const [credentials, setCredentials] = useState(null);
   const [hasAudio, setHasAudio] = useState(user.defaultSettings.publishAudio);
   const [hasVideo, setHasVideo] = useState(user.defaultSettings.publishVideo);
+  const [isModerationActive, setIsModerationActive] = useState(false);
   const [cameraIsInappropriate, setCameraIsInappropriate] = useState(false);
   const classes = useStyles();
 
@@ -38,21 +39,12 @@ export function VideoRoom() {
     setHasVideo((prevVideo) => !prevVideo);
   }, []);
 
-  /* const disableVideoForInappropriateContent =  () => {
-    // todo Send Signal
-    if (session && publisher) {
-      publisher.publishVideo(false);
-      setCameraIsInappropriate(true);
-      // todo add Timeout - need to enable after X seconds
-    }
-  } */
-
   useEffect(() => {
     if (cameraIsInappropriate && session && publisher) {
       publisher.publishVideo(false);
       session.current.signal({
         data: JSON.stringify({ publisher: publisher.id }),
-        type: "inappropriate_content",
+        type: 'inappropriate_content',
       });
     }
   }, [cameraIsInappropriate, session, publisher]);
@@ -103,7 +95,7 @@ export function VideoRoom() {
       className={classes.container}
       ref={videoContainer}
     >
-      <MeetingName meetingName={"Meeting"} />
+      <MeetingName meetingName={'Meeting'} />
       <ControlToolBar
         className={classes.controlToolbar}
         hasAudio={hasAudio}
@@ -112,12 +104,15 @@ export function VideoRoom() {
         handleVideoButtonClick={toggleVideo}
         currentSession={session.current}
         currentPublisher={publisher}
+        isModerationActive={isModerationActive}
         videoContainer={videoContainer.current}
       ></ControlToolBar>
       <Moderation
         currentPublisher={publisher}
         currentSession={session.current}
         setCameraIsInappropriate={setCameraIsInappropriate}
+        isModerationActive={isModerationActive}
+        setIsModerationActive={setIsModerationActive}
       />
     </div>
   );

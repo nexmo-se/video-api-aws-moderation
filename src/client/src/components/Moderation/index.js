@@ -17,12 +17,15 @@ export function Moderation({
   currentPublisher,
   currentSession,
   setCameraIsInappropriate,
+  isModerationActive,
+  setIsModerationActive,
 }) {
   const [openWarnSnackbar, setWarnOpenSnackbar] = useState(false);
   const [openInfoSnackbar, setInfoOpenSnackbar] = useState(false);
-  const { isModerationActive, setIsModerationActive } = useModeration({
+  const { moderationLabels } = useModeration({
     currentPublisher,
     currentSession,
+    isModerationActive,
     setWarnOpenSnackbar,
     setInfoOpenSnackbar,
     setCameraIsInappropriate,
@@ -72,8 +75,13 @@ export function Moderation({
         onClose={handleWarnClose}
       >
         <Alert onClose={handleWarnClose} severity="warning">
-          We have disabled your webcam because we have detected Inappropriate
-          Content
+          {moderationLabels && (
+            <h4 style={{ margin: 0 }}>
+              We have detected {moderationLabels.ParentName}{' '}
+              {moderationLabels.Name} with Confidence:{' '}
+              {moderationLabels.Confidence}
+            </h4>
+          )}
         </Alert>
       </Snackbar>
       <Snackbar
@@ -83,8 +91,10 @@ export function Moderation({
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
         <Alert onClose={handleInfoClose} severity="info">
-          We have disabled the participant's video because we have detected
-          Inappropriate Content
+          <h4 style={{ margin: 0 }}>
+            We have disabled the participant's video because we have detected
+            Inappropriate Content
+          </h4>
         </Alert>
       </Snackbar>
     </>
