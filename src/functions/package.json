@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "deploy": "sls deploy --aws-profile enrico.portolan-nexmo",
+    "deploy": "sls deploy ",
     "test-create-room": "SLS_DEBUG=* serverless invoke local --function createRoom --path mock/createRoom.json"
   },
   "author": "",

@@ -28,6 +28,30 @@ The frontend is a React Single page application.
 
 For more information about the client app, navigate to [Client Docs](./src/client/README.md).
 
-## Deployment
+## Usage
 
-// add instruction
+### Prerequisites
+
+To deploy the sample application, you will require: 
+
+- Vonage Video API account: [https://www.vonage.co.uk/communications-apis/video/](https://www.vonage.co.uk/communications-apis/video/)
+- AWS account: [https://aws.amazon.com](https://www.vonage.co.uk/communications-apis/video/)
+
+### Deployment
+
+#### Server
+
+The server side application uses the [Serverless Framework](https://www.serverless.com/) to deploy the AWS components such as AWS Lambda and AWS DynamoDB. 
+
+To deploy the server side application, follow these steps:
+
+1. Navigate to the server folder: `cd src/functions`
+2. Run `npm install`
+3. Run `serverless deploy` to deploy the app (https://www.serverless.com/framework/docs/providers/aws/cli-reference/deploy/). If you want to use a specific user for the deploy, add the `--aws-profile` option. Example: `serverless deploy --aws-profile enricop89`
+
+
+#### Client
+
+The client application is deployed on a S3 bucket and served by a CloudFront distribution. So you would need to create 
+
+
