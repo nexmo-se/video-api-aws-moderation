@@ -41,10 +41,6 @@ provider:
         - "rekognition:DetectModerationLabels"
       Resource:
         - '*'     
-  # apiGateway:
-  #   binaryMediaTypes:
-  #     - 'image/png'
-  #     - ‘image/jpeg’
 
 functions:
   createRoom:
