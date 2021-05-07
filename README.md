@@ -52,6 +52,8 @@ To deploy the server side application, follow these steps:
 
 #### Client
 
-The client application is deployed on a S3 bucket and served by a CloudFront distribution. So you would need to create 
+The client application is deployed on a S3 bucket and served by a CloudFront distribution. Once you have created the S3 Bucket and link it to the Cloudfront distribution, you can build the frontend app running `npm run build` on the `src/client` folder.
+
+
 
 
