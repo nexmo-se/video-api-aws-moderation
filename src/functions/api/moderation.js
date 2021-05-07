@@ -28,7 +28,7 @@ function parseModerationResult(moderationLabels) {
       }
     ] */
 
-  // todo save on Dynamo
+  // todo Roadmap: save results on Dynamo
   console.log(
     'moderationLabels.ModerationLabels',
     moderationLabels.ModerationLabels
@@ -42,7 +42,6 @@ function parseModerationResult(moderationLabels) {
 }
 
 module.exports.handler = async (event) => {
-  // here should I have a base64Image
 
   try {
     var event2 = event;
