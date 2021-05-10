@@ -1,0 +1,109 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Dscription: Deploy static website with S3 and Cloudfront
+Parameters:
+  BucketName:
+    Type: String
+    Description: The name for the bucket hosting your website
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: Website Configuration
+      Parameters:
+      - BucketName
+    ParameterLabels:
+      BucketName:
+        default: S3 Bucket Name
+Resources:
+  WebsiteBucket:
+    Properties:
+      BucketName:
+        Ref: BucketName
+      # WebsiteConfiguration:
+      #   IndexDocument: index.html
+      # CorsConfiguration:
+      #   CorsRules:
+      #   - AllowedHeaders:
+      #     - "*"
+      #     AllowedMethods:
+      #     - GET
+      #     AllowedOrigins:
+      #     - "*"
+      #     Id: OpenCors
+      #     MaxAge: '3600'
+    Type: AWS::S3::Bucket
+  # WebsiteBucketPolicy:
+  #   Properties:
+  #     Bucket:
+  #       Ref: WebsiteBucket
+  #     PolicyDocument:
+  #       Version: '2012-10-17'
+  #       Statement:
+  #       - Effect: Allow
+  #         Principal: "*"
+  #         Action: s3:GetObject
+  #         Resource:
+  #           Fn::Sub: arn:aws:s3:::${WebsiteBucket}/*
+  #  Type: AWS::S3::BucketPolicy
+  WebsiteCloudFront:
+    Type: AWS::CloudFront::Distribution
+    DependsOn:
+    - WebsiteBucket
+    Properties:
+      DistributionConfig:
+        Origins:
+        - DomainName:
+            Fn::GetAtt:
+            - WebsiteBucket
+            - RegionalDomainName
+          Id:
+            Ref: WebsiteBucket
+          CustomOriginConfig:
+            HTTPPort: '80'
+            HTTPSPort: '443'
+            OriginProtocolPolicy: http-only
+        Enabled: 'true'
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          TargetOriginId:
+            Ref: WebsiteBucket
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+          - GET
+          - HEAD
+          - OPTIONS
+          CachedMethods:
+          - GET
+          - HEAD
+          - OPTIONS
+          Compress: false
+          ForwardedValues:
+            QueryString: 'true'
+            Cookies:
+              Forward: none
+            Headers:
+            - Access-Control-Request-Headers
+            - Access-Control-Request-Method
+            - Origin
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: 'true'
+        CustomErrorResponses:
+        - ErrorCode: 404
+          ResponseCode: 200
+          ResponsePagePath: "/index.html"
+        - ErrorCode: 403
+          ResponseCode: 200
+          ResponsePagePath: "/index.html"
+  
+Outputs:
+  S3WebsiteURL:
+    Value:
+      Fn::GetAtt:
+      - WebsiteBucket
+      - WebsiteURL
+  CloudFrontDomain:
+    Value:
+      Fn::GetAtt:
+      - WebsiteCloudFront
+      - DomainName
