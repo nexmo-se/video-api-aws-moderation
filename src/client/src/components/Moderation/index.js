@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { sendImage } from './../../api/sendImage';
 import useInterval from './../../hooks/useInterval';
 import useModeration from './../../hooks/useModeration';
+import useTranscribe from './../../hooks/useTranscribe';
 
 import { Button, Chip, Snackbar, Switch } from '@material-ui/core';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
@@ -17,11 +18,15 @@ export function Moderation({
   currentPublisher,
   currentSession,
   setCameraIsInappropriate,
+  setMicrophoneIsInappropriate,
   isModerationActive,
-  setIsModerationActive,
+  setIsModerationActive
 }) {
   const [openWarnSnackbar, setWarnOpenSnackbar] = useState(false);
+  const [openWarnAudioSnackbar, setWarnAudioOpenSnackbar] = useState(false);
   const [openInfoSnackbar, setInfoOpenSnackbar] = useState(false);
+  const [openInfoMicrophoneSnackbar, setInfoOpenMicrophoneSnackbar] =
+    useState(false);
   const { moderationLabels } = useModeration({
     currentPublisher,
     currentSession,
@@ -29,6 +34,19 @@ export function Moderation({
     setWarnOpenSnackbar,
     setInfoOpenSnackbar,
     setCameraIsInappropriate,
+    setInfoOpenMicrophoneSnackbar
+  });
+
+  const {
+    startAudioModeration,
+    stopAudioModeration,
+    profanityDetected,
+    transcription
+  } = useTranscribe({
+    currentPublisher,
+    currentSession,
+    setMicrophoneIsInappropriate,
+    setWarnAudioOpenSnackbar
   });
 
   const classes = useStyles();
@@ -40,6 +58,16 @@ export function Moderation({
     setWarnOpenSnackbar(false);
   };
 
+  const handleWarnAudioClose = (
+    event?: React.SyntheticEvent,
+    reason?: string
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setWarnAudioOpenSnackbar(false);
+  };
+
   const handleInfoClose = (event?: React.SyntheticEvent, reason?: string) => {
     if (reason === 'clickaway') {
       return;
@@ -47,7 +75,22 @@ export function Moderation({
     setInfoOpenSnackbar(false);
   };
 
+  const handleInfoMicrophoneClose = (
+    event?: React.SyntheticEvent,
+    reason?: string
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setInfoOpenMicrophoneSnackbar(false);
+  };
+
   const handleSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      startAudioModeration();
+    } else {
+      stopAudioModeration();
+    }
     setIsModerationActive(event.target.checked);
   };
 
@@ -68,7 +111,40 @@ export function Moderation({
           variant="outlined"
         />
       </div>
-
+      {transcription && (
+        <div className={classes.transcriptionContainer}>
+          <div className={classes.transcriptionText}>{transcription}</div>
+        </div>
+      )}
+      {/*Snackbar for Audio Modeation*/}
+      <Snackbar
+        open={openWarnAudioSnackbar}
+        autoHideDuration={10000}
+        onClose={handleWarnAudioClose}
+      >
+        <Alert onClose={handleWarnAudioClose} severity="warning">
+          {profanityDetected && (
+            <h4 style={{ margin: 0 }}>
+              We have detected a forbidded word. Your microphone has been
+              disabled
+            </h4>
+          )}
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={openInfoMicrophoneSnackbar}
+        autoHideDuration={10000}
+        onClose={handleInfoMicrophoneClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleInfoMicrophoneClose} severity="info">
+          <h4 style={{ margin: 0 }}>
+            We have disabled the participant's microphone because we have
+            detected Inappropriate Content
+          </h4>
+        </Alert>
+      </Snackbar>
+      {/*Snackbar for Video Modeation*/}
       <Snackbar
         open={openWarnSnackbar}
         autoHideDuration={10000}
