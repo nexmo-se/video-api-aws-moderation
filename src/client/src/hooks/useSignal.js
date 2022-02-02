@@ -1,6 +1,9 @@
 import { useCallback, useEffect } from 'react';
 
-export default function useSignal(session, { handleSetInfoOpenSnackbar }) {
+export default function useSignal(
+  session,
+  { handleSetInfoOpenSnackbar, handleSetInfoMicrophoneOpenSnackbar }
+) {
   const sendSignalToAll = useCallback((session, payload) => {
     session.signal(payload, function (error) {
       if (error) {
@@ -18,12 +21,20 @@ export default function useSignal(session, { handleSetInfoOpenSnackbar }) {
       session.on('signal', (event) => {
         console.log('Signal sent from connection ' + event.from.connection);
         switch (event.type) {
-          case 'signal:inappropriate_content':
+          case 'signal:inappropriate_camera_content':
             if (
               session.connection &&
               event.from.connectionId !== session.connection.id
             ) {
               handleSetInfoOpenSnackbar(true);
+            }
+            break;
+          case 'signal:inappropriate_microphone_content':
+            if (
+              session.connection &&
+              event.from.connectionId !== session.connection.id
+            ) {
+              handleSetInfoMicrophoneOpenSnackbar(true);
             }
             break;
           default:

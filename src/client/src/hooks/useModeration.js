@@ -15,6 +15,7 @@ export default function useModeration({
   setWarnOpenSnackbar,
   setCameraIsInappropriate,
   setInfoOpenSnackbar,
+  setInfoOpenMicrophoneSnackbar
 }) {
   /* const [isModerationActive, setIsModerationActive] = useState(false); */
   const [moderationLabels, setModerationLabels] = useState(null);
@@ -22,7 +23,10 @@ export default function useModeration({
   const [timeoutDelay, setTimeoutDelay] = useState(disableTimeout);
   const [isTimeoutRunning, setIsTimeoutRunning] = useState(false);
   const [isIntervalRunning, setIsIntervalRunning] = useState(true);
-  useSignal(currentSession, { handleSetInfoOpenSnackbar: setInfoOpenSnackbar });
+  useSignal(currentSession, {
+    handleSetInfoOpenSnackbar: setInfoOpenSnackbar,
+    handleSetInfoMicrophoneOpenSnackbar: setInfoOpenMicrophoneSnackbar
+  });
 
   useInterval(
     () => {
@@ -64,7 +68,6 @@ export default function useModeration({
 
   return {
     isModerationActive,
-    moderationLabels,
-    /* setIsModerationActive, */
+    moderationLabels
   };
 }

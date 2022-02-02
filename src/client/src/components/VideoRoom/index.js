@@ -3,7 +3,7 @@ import React, {
   useContext,
   useEffect,
   useRef,
-  useState,
+  useState
 } from 'react';
 import { getCredentials } from '../../api/credentials';
 import { usePublisher } from '../../hooks/usePublisher';
@@ -21,7 +21,7 @@ export function VideoRoom() {
   const videoContainer = useRef();
   const { publisher, publish, pubInitialised } = usePublisher();
   const { session, createSession, connected } = useSession({
-    container: videoContainer,
+    container: videoContainer
   });
 
   const [credentials, setCredentials] = useState(null);
@@ -29,6 +29,8 @@ export function VideoRoom() {
   const [hasVideo, setHasVideo] = useState(user.defaultSettings.publishVideo);
   const [isModerationActive, setIsModerationActive] = useState(false);
   const [cameraIsInappropriate, setCameraIsInappropriate] = useState(false);
+  const [microphoneIsInappropriate, setMicrophoneIsInappropriate] =
+    useState(false);
   const classes = useStyles();
 
   const toggleAudio = useCallback(() => {
@@ -42,12 +44,26 @@ export function VideoRoom() {
   useEffect(() => {
     if (cameraIsInappropriate && session && publisher) {
       publisher.publishVideo(false);
+      setHasVideo(false);
       session.current.signal({
         data: JSON.stringify({ publisher: publisher.id }),
-        type: 'inappropriate_content',
+        type: 'inappropriate_camera_content'
       });
     }
   }, [cameraIsInappropriate, session, publisher]);
+
+  useEffect(() => {
+    console.log('microphoneIsInappropriate', microphoneIsInappropriate);
+    if (microphoneIsInappropriate && session && publisher) {
+      console.log('microphoneIsInappropriate2', microphoneIsInappropriate);
+      publisher.publishAudio(false);
+      setHasAudio(false);
+      session.current.signal({
+        data: JSON.stringify({ publisher: publisher.id }),
+        type: 'inappropriate_microphone_content'
+      });
+    }
+  }, [microphoneIsInappropriate, session, publisher]);
 
   useEffect(() => {
     getCredentials(roomName).then(({ apikey, sessionId, token }) => {
@@ -72,7 +88,7 @@ export function VideoRoom() {
       publish({
         session: session.current,
         containerId: videoContainer.current.id,
-        publisherOptions: { ...user.defaultSettings, name: user.userName },
+        publisherOptions: { ...user.defaultSettings, name: user.userName }
       }).then(() => {});
     }
   }, [publish, session, connected, pubInitialised, user]);
@@ -82,6 +98,12 @@ export function VideoRoom() {
       publisher.publishAudio(hasAudio);
     }
   }, [hasAudio, publisher]);
+
+  useEffect(() => {
+    if (publisher && !microphoneIsInappropriate) {
+      publisher.publishAudio(hasAudio);
+    }
+  }, [hasAudio, publisher, microphoneIsInappropriate]);
 
   useEffect(() => {
     if (publisher && !cameraIsInappropriate) {
@@ -111,6 +133,7 @@ export function VideoRoom() {
         currentPublisher={publisher}
         currentSession={session.current}
         setCameraIsInappropriate={setCameraIsInappropriate}
+        setMicrophoneIsInappropriate={setMicrophoneIsInappropriate}
         isModerationActive={isModerationActive}
         setIsModerationActive={setIsModerationActive}
       />

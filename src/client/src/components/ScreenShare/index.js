@@ -8,13 +8,13 @@ import Alert from '@material-ui/lab/Alert';
 export function ScreenShare({
   currentSession,
   videoContainer,
-  isModerationActive,
+  isModerationActive
 }) {
   const {
     publisher: screenPublisher,
     publish,
     unpublish,
-    pubInitialised,
+    pubInitialised
   } = usePublisher();
   const [sharing, setSharing] = useState(false);
   const session = useRef(null);
@@ -27,7 +27,7 @@ export function ScreenShare({
     isModerationActive,
     setWarnOpenSnackbar,
     setInfoOpenSnackbar,
-    setCameraIsInappropriate,
+    setCameraIsInappropriate
   });
 
   const handleWarnClose = (event?: React.SyntheticEvent, reason?: string) => {
@@ -49,7 +49,7 @@ export function ScreenShare({
       await publish({
         session: session.current,
         containerId: videoContainer.id,
-        publisherOptions: { videoSource: 'screen' },
+        publisherOptions: { videoSource: 'screen' }
       });
       setSharing(true);
     } else if (session.current && sharing) {
@@ -97,7 +97,7 @@ export function ScreenShare({
       screenPublisher.publishVideo(false);
       session.current.signal({
         data: JSON.stringify({ publisher: screenPublisher.id }),
-        type: 'inappropriate_content',
+        type: 'inappropriate_camera_content'
       });
     }
   }, [cameraIsInappropriate, session, screenPublisher]);
