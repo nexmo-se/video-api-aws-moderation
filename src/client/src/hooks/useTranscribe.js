@@ -129,6 +129,7 @@ export default function useTranscribe({
   const stopAudioModeration = async () => {
     if (transcribeStreamingClient && transcribeStreamingClient.current) {
       micStream.current.pauseRecording();
+      setTranscription(null);
       /* await transcribeStreamingClient.current.destroy();
       micStream.current = null;
       transcribeStreamingClient.current = null;

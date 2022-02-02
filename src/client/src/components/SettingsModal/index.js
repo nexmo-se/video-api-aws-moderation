@@ -42,7 +42,6 @@ export function SettingsModal({ open, onCloseClick, currentPublisher }) {
     return new Promise((resolve, reject) => {
       OT.getDevices((err, devices) => {
         if (!err) {
-          console.log("devices", devices);
           const audioInputs = devices.filter(
             (device) => device.kind === "audioInput"
           );
