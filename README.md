@@ -5,13 +5,18 @@ Vonage Video API Moderation Demo is a solution that leverages [Vonage Video API]
 The application has the following features:
 
 - detect innapropriate content published from the camera
-- detect innapropriate content published from the screenshare of the device
+- detect innapropriate content published from the screenshare
+- detect innapropriate words published from the microphone
 - suppress offensive content when detected
 - notify the participants of the call when innapropriate content is detected
 
+#### Update Feb 2022
+
+Audio moderation added: the demo uses [AWS Transcribe](https://aws.amazon.com/transcribe/) service to process audio chucks published from the microphone. I added a filter dictionary (available on the resources folder) to detect specific words.
+
 ## Architecture
 
-![](docs/img/aws-moderation-architecture.png)
+![](docs/img/aws-moderation-architecture-2.png)
 
 The application backend is implemented using AWS Serverless components such as AWS Lambda, AWS API Gateway, AWS DynamoDB and AWS Rekognition service. The backend is deployed using the [Serverless Framework](https://www.serverless.com/).
 
