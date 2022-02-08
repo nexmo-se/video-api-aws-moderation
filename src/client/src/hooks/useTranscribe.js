@@ -108,6 +108,7 @@ export default function useTranscribe({
       // high-quality audio. The sample rate must match the sample rate in the audio file.
       MediaSampleRateHertz: 44100,
       AudioStream: encodedAudioStream,
+      EnablePartialResultsStabilization: true,
       PartialResultsStability: 'high',
       VocabularyFilterName: 'ProfanityModerationList'
     });
