@@ -30,6 +30,9 @@ export default function useModeration({
 
   useInterval(
     () => {
+      /* console.log('isModerationActive', isModerationActive);
+      console.log('currentPublisher', currentPublisher); */
+
       if (
         currentPublisher &&
         !currentPublisher.isLoading() &&
@@ -37,6 +40,7 @@ export default function useModeration({
         currentPublisher.stream.hasVideo &&
         isModerationActive
       ) {
+        console.log('Moderation - sendImage');
         sendImage(currentPublisher.getImgData()).then((res) => {
           if (res && res.error) {
             return;

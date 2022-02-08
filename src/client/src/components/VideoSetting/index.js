@@ -5,8 +5,6 @@ import Switch from "@material-ui/core/Switch";
 
 export const VideoSettings = React.memo(
   ({ hasVideo, onVideoChange, className }) => {
-    // const [enabled, setEnabled] = useState(hasAudio);
-    console.log("Video Setting", hasVideo);
     return (
       <div className={className}>
         <Videocam />
