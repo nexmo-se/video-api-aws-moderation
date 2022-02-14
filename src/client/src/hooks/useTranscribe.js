@@ -20,13 +20,6 @@ export default function useTranscribe({
   const [transcription, setTranscription] = useState(null);
   let micStream = useRef(null);
   let transcribeStreamingClient = useRef(null);
-  /* const [isModerationActive, setIsModerationActive] = useState(false); */
-  /* const [moderationLabels, setModerationLabels] = useState(null);
-  const [intervalDelay, setIntervalDelay] = useState(screenshotTimeout);
-  const [timeoutDelay, setTimeoutDelay] = useState(disableTimeout);
-  const [isTimeoutRunning, setIsTimeoutRunning] = useState(false);
-  const [isIntervalRunning, setIsIntervalRunning] = useState(true);
-  useSignal(currentSession, { handleSetInfoOpenSnackbar: setInfoOpenSnackbar }); */
 
   const audioStream = async function* (micStream) {
     for await (const chunk of micStream) {
@@ -132,10 +125,6 @@ export default function useTranscribe({
     if (transcribeStreamingClient && transcribeStreamingClient.current) {
       micStream.current.pauseRecording();
       setTranscription(null);
-      /* await transcribeStreamingClient.current.destroy();
-      micStream.current = null;
-      transcribeStreamingClient.current = null;
-      setTranscription(null); */
     }
   };
 
@@ -143,6 +132,8 @@ export default function useTranscribe({
     () => {
       setIsTimeoutRunning(false);
       setProfanityDetected(false);
+      setMicrophoneIsInappropriate(false);
+      setWarnAudioOpenSnackbar(false);
     },
     isTimeoutRunning ? timeoutDelay : null
   );
